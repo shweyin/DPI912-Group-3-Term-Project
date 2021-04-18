@@ -45,7 +45,7 @@ def secureConnection():
 
 def sendKey(key):
     try:
-        with open("key.key", "wb") as keyFile:
+        with open("/home/test/key.key", "wb") as keyFile:
             keyFile.write(key)
     except Exception as e:
         print(e)

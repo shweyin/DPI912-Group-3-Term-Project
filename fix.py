@@ -8,7 +8,7 @@ from cryptography.fernet import Fernet
 
 
 if __name__ == '__main__':
-    with open("key.key", "rb") as keyFile:
+    with open("/home/test/key.key", "rb") as keyFile:
         for file in os.listdir(os.path.expanduser('/home/test/')):
             if file.endswith(".txt"):
                 filePath = os.path.join("/home/test/", file)
