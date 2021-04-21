@@ -41,7 +41,7 @@ def signalHandler(signalNumber, frame):
 
 def clientHandler(clientSocket):
     key = clientSocket.recv(1024)
-    with open("/home/lab/labkeys/key.key", "ab") as keyFile:
+    with open("/home/lab/key.key", "ab") as keyFile:
         keyFile.write(key + "\n".encode("ascii"))
 
 
